@@ -1,7 +1,6 @@
-const MemoryGame = require('./memory');
 
-console.log('Memory index.js loaded');
 
+console.log("Memory index.js loaded")
 const cards = [
   { name: 'aquaman', img: 'aquaman.jpg' },
   { name: 'batman', img: 'batman.jpg' },
@@ -29,11 +28,12 @@ const cards = [
   { name: 'thor', img: 'thor.jpg' }
 ];
 
-let memoryGame = new MemoryGame(cards);
+let memoryGame = new MemoryGame(cards)
 
-const memoryBoard = document.getElementById('memory-board');
+const memoryBoard = document.getElementById("memory-board")
 
-const cardsHTML = memoryGame.cards.map((card) => {
+const cardsHTML = memoryGame.cards.map(
+  card=>{
   // These actions can only be taken when the page is completely loaded
   /*
    *
@@ -43,63 +43,74 @@ const cardsHTML = memoryGame.cards.map((card) => {
       <div class="front" style="background: url(img/${card.img}) no-repeat"></div>
     </div>
   */
-  const outsideDiv = document.createElement('div');
-  outsideDiv.classList.add('card');
-  outsideDiv.setAttribute('data-card-name', card.name);
 
-  const insideDivback = document.createElement('div');
-  insideDivback.classList.add('back');
-  insideDivback.name = card.img;
+    const outsideDiv = document.createElement("div")
+    outsideDiv.classList.add("card")
+    outsideDiv.setAttribute("data-card-name", card.name)
 
-  const insideDivFront = document.createElement('div');
-  insideDivFront.classList.add('front');
-  insideDivFront.name = card.img;
+    const insideDivBack = document.createElement("div")
+    insideDivBack.classList.add("back")
+    insideDivBack.name = card.img
 
-  // SAME AS HTML INLINE LOOK LINE 47
-  insideDivFront.style = `background: url(img/${card.img}) no-repeat`;
+    const insideDivFront = document.createElement("div")
+    insideDivFront.classList.add("front")
+    insideDivFront.name = card.img
+    insideDivFront.style = `background: url(img/${card.img}) no-repeat` // same as HTM inline <div style= ...
+    
+    outsideDiv.appendChild(insideDivBack)
+    outsideDiv.appendChild(insideDivFront)
 
-  outsideDiv.appendChild(insideDivback);
-  outsideDiv.appendChild(insideDivFront);
+    return outsideDiv
+  }
+)
 
-  return outsideDiv;
-});
 
-cardsHTML.forEach((cardhtml) => { // MAIN LOOp ->> AFTER CLICKING
-  cardhtml.addEventListener('click', (event) => {
-    const clickedCard = event.currentTarget; // SAVE THE CLICK INFO INTO A CONST to know which div is clicked
+function flipCard(card){
+  card.classList.toggle("turned")
+}
 
-    flipCard(clickedCard) // NEED TO TO FUNCTION OUTSIDE
+function setCardsToGuessed(card) {
+  card.classList.add('guessed');
+}
 
-    const playResults = memoryGame.playCard() // NOT DONE YET
+function updateScoresBoard(score, clicked, guessed) {
+  document.getElementById('score').innerText = score;
+  document.getElementById('pairs-clicked').innerText = clicked;
+  document.getElementById('pairs-guessed').innerText = guessed;
+}
 
-    // the following line is based on the fact that I would like to pass complex object from the game logic
-    // the object is: { isPair: false, playedCards this.playedCards }
+cardsHTML.forEach(cardHtml => {
+  cardHtml.addEventListener(
+    "click",
 
-    if(playResults.isPair) {
-      playResults.playedCards.forEach(card=> setCardToGuessed(card))
-       // NEED TO DO THE GRAPHIC PART NOT DONE YET
-    }else{
-      playedCards.cards.forEach(card=>{
-        setTimeout(()=>flipCard(card), 1 * 1000)
-      })
+    // ------ main game loop started by user click ---------
+    ( event )=>{
+      const clickedCard = event.currentTarget // ----- only way to know which div was clicked -------
+      flipCard(clickedCard)
 
-      updateScoreBoard(
-        memoryGame.score,
-        memoryGame.clickedPairs,
-        memoryGame.guessdeParis,
+      const playResults = memoryGame.playCard( clickedCard )
 
-      )
+      // the following line is based on the fact that I would like to pass complex object from the game logic
+      // the object is: { isPair: false, playedCards: this.playedCards }
+      if(playResults.isPair){
+        playResults.playedCards.forEach(card=> setCardsToGuessed(card))
+      }else{
+        playResults.playedCards.forEach( card=>{
+          setTimeout(()=>flipCard(card), 1 * 1000)
+        })
 
-      if(memoryGame.checkIfGameOver()) gameWon()
+        updateScoreBoard(
+          memoryGame.score,
+          memoryGame.clickedPairs,
+          memoryGame.guessedPairs
+        )
+
+        if(memoryGame.checkIfGameOver()) gameWon()
+      }
     }
-
-  });
-
- 
+    // ---------- end game loop --------
+  )
 
   cardsHTML.forEach((cardHtml) => memoryBoard.appendChild(cardHtml));
-  
 });
 
-
-// AFTER THIS TRY TO PLAY A CARD
