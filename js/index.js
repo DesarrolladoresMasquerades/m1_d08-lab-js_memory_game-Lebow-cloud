@@ -1,5 +1,3 @@
-
-
 console.log("Memory index.js loaded")
 const cards = [
   { name: 'aquaman', img: 'aquaman.jpg' },
@@ -79,6 +77,19 @@ function updateScoresBoard(score, clicked, guessed) {
   document.getElementById('pairs-guessed').innerText = guessed;
 }
 
+
+function gameWon() {
+  const winOverlay = document.createElement('div');
+  const winBanner = document.createElement('h1');
+  winBanner.innerText = 'YOU HAVE SUPERPOWERS !';
+  winOverlay.appendChild(winBanner);
+  winOverlay.style.backgroundImage =
+    "url('https://wallpaperaccess.com/full/1135868.jpg')";
+  winOverlay.classList.add('win-modal');
+  document.querySelector('#memory-board').appendChild(winOverlay);
+}
+
+
 cardsHTML.forEach(cardHtml => {
   cardHtml.addEventListener(
     "click",
@@ -98,15 +109,16 @@ cardsHTML.forEach(cardHtml => {
         playResults.playedCards.forEach( card=>{
           setTimeout(()=>flipCard(card), 1 * 1000)
         })
-
-        updateScoreBoard(
+      }
+      
+        updateScoresBoard(
           memoryGame.score,
           memoryGame.clickedPairs,
           memoryGame.guessedPairs
         )
 
         if(memoryGame.checkIfGameOver()) gameWon()
-      }
+
     }
     // ---------- end game loop --------
   )
